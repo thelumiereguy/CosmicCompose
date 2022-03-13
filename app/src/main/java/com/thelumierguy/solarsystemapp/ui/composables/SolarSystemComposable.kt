@@ -19,41 +19,6 @@ import com.thelumierguy.solarsystemapp.ui.composables.planet_layout.PlanetsLayou
 @Composable
 fun SolarSystemComposable(modifier: Modifier) {
 
-    val planetDetails = remember {
-        listOf(
-            PlanetDetails(
-                hue = 200f,
-                saturation = 0.2f,
-                radius = 30f,
-                revolutionDurationDays = 88
-            ),
-            PlanetDetails(
-                hue = 30f,
-                saturation = 0.3f,
-                radius = 35f,
-                revolutionDurationDays = 224
-            ),
-            PlanetDetails(
-                hue = 220f,
-                saturation = 0.4f,
-                radius = 40f,
-                revolutionDurationDays = 365
-            ),
-            PlanetDetails(
-                hue = 10f,
-                saturation = 0.6f,
-                radius = 35f,
-                revolutionDurationDays = 687
-            ),
-            PlanetDetails(
-                hue = 30f,
-                saturation = 0.4f,
-                radius = 60f,
-                revolutionDurationDays = 4346
-            )
-        )
-    }
-
     Box(modifier = modifier.background(Color.Black)) {
 
         StarsComposable(
@@ -68,19 +33,9 @@ fun SolarSystemComposable(modifier: Modifier) {
                 .align(Alignment.Center)
         )
 
-        PlanetsLayout(
-            planetDetails
-        )
+        PlanetsLayout()
     }
 }
-
-data class PlanetDetails(
-    val hue: Float,
-    val saturation: Float,
-    val radius: Float,
-    val revolutionDurationDays: Int,
-)
-
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Preview

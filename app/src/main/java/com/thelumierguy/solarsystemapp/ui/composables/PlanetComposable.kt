@@ -4,11 +4,11 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ExperimentalGraphicsApi
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
+import com.thelumierguy.solarsystemapp.ui.composables.planet_layout.PlanetDetails
 import dev.romainguy.kotlin.math.*
 import kotlin.math.roundToInt
 
@@ -25,7 +25,8 @@ private const val pixelsDivisions = 2
 fun PlanetComposable(
     modifier: Modifier,
     planetDetails: PlanetDetails,
-    lightSourceLocationProvider: () -> Float2
+    lightSourceLocationProvider: () -> Float2,
+    index: Int
 ) {
 
     val lightSourceLocation = lightSourceLocationProvider()
@@ -53,22 +54,25 @@ fun PlanetComposable(
             dot(
                 downVectorNormalized,
                 normalize(lightSourceTranslated)
-            ) * 250f
+            ) * 500f
         )
     }
 
 
     val pointsList = remember {
-        val bounds = planetDetails.radius.roundToInt()
 
+        val bounds = planetDetails.radius.roundToInt()
         (-bounds..bounds step pixelsDivisions).flatMap { x ->
-            (-bounds..bounds step pixelsDivisions).map { y ->
+            (-bounds..bounds step pixelsDivisions).mapNotNull { y ->
                 val pos = Float2(
                     x.toFloat(),
                     y.toFloat()
                 )
-                val z = length(pos) - planetDetails.radius
-                Float3(pos, z)
+                val length = length(pos)
+                if (length <= bounds) {
+                    val z = length - planetDetails.radius
+                    Float3(pos, z)
+                } else null
             }
         }
     }
@@ -79,9 +83,7 @@ fun PlanetComposable(
     }) {
 
         if (lightSourceLocation.x != 0f && lightSourceLocation.y != 0f) {
-            pointsList.filter {
-                length(it) < planetDetails.radius
-            }.forEach { coord ->
+            pointsList.forEach { coord ->
 
                 val normalizedCoord = normalize(
                     coord
@@ -91,12 +93,12 @@ fun PlanetComposable(
                     lightSource3d
                 )
 
-                val lightFalloffFactor = length(worldPosition) * 0.003f // Scaled down vector
+                val lightFalloffFactor = 0.5f / (index + 1) // Inverse of index
 
                 var dotProduct = dot(
                     normalizedCoord,
                     normalizedLightSource3D
-                ) / lightFalloffFactor
+                ) * lightFalloffFactor
 
 
                 if (dotProduct.isNaN()) {
@@ -105,9 +107,14 @@ fun PlanetComposable(
 
                 drawCircle(
                     color = Color.hsl(
-                        planetDetails.hue,
-                        planetDetails.saturation,
-                        dotProduct.coerceIn(0f..1f),
+                        hue = planetDetails.hue,
+                        saturation = planetDetails.saturation,
+                        lightness = dotProduct.coerceIn(0f..1f),
+                        alpha = if (isBehindLightSource(coord, lightSource3d)) {
+                            0f
+                        } else {
+                            1f
+                        }
                     ),
                     radius = 2f,
                     center = Offset(coord.x, coord.y)
@@ -115,4 +122,13 @@ fun PlanetComposable(
             }
         }
     }
+}
+
+private fun isBehindLightSource(
+    planetLocation: Float3,
+    lightSourceLocation: Float3
+): Boolean {
+    return planetLocation.z < lightSourceLocation.z &&
+            (planetLocation.x !in ((lightSourceLocation.x - 100)..lightSourceLocation.x + 100) &&
+                    planetLocation.y !in ((lightSourceLocation.y - 100)..lightSourceLocation.y + 100))
 }
