@@ -1,4 +1,4 @@
-package com.thelumierguy.solarsystemapp.ui.composables
+package com.thelumierguy.solarsystemapp.ui.composables.stars
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.BoxWithConstraints

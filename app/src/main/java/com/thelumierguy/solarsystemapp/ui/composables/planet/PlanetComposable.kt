@@ -1,4 +1,4 @@
-package com.thelumierguy.solarsystemapp.ui.composables
+package com.thelumierguy.solarsystemapp.ui.composables.planet
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.*
@@ -8,8 +8,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ExperimentalGraphicsApi
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
-import com.thelumierguy.solarsystemapp.ui.composables.planet_layout.PlanetDetails
+import com.thelumierguy.solarsystemapp.ui.composables.planet_layout.PlanetsLayoutScope
 import dev.romainguy.kotlin.math.*
+import kotlin.math.atan
 import kotlin.math.roundToInt
 
 // lower means more quality
@@ -22,11 +23,10 @@ private const val pixelsDivisions = 2
  */
 @OptIn(ExperimentalGraphicsApi::class)
 @Composable
-fun PlanetComposable(
+fun PlanetsLayoutScope.PlanetComposable(
     modifier: Modifier,
-    planetDetails: PlanetDetails,
-    lightSourceLocationProvider: () -> Float2,
-    index: Int
+    lightSourceRadius: Float,
+    lightSourceLocationProvider: () -> Float2
 ) {
 
     val lightSourceLocation = lightSourceLocationProvider()
@@ -83,52 +83,83 @@ fun PlanetComposable(
     }) {
 
         if (lightSourceLocation.x != 0f && lightSourceLocation.y != 0f) {
-            pointsList.forEach { coord ->
+            pointsList.forEach { planetPointCoord ->
 
                 val normalizedCoord = normalize(
-                    coord
+                    planetPointCoord
                 )
 
                 val normalizedLightSource3D = normalize(
                     lightSource3d
                 )
 
-                val lightFalloffFactor = 0.5f / (index + 1) // Inverse of index
+                val lightFalloffFactor = 0.8f / (index + 1) // Inverse of index
 
-                var dotProduct = dot(
+                val pointLightness = getDotProduct(
                     normalizedCoord,
                     normalizedLightSource3D
                 ) * lightFalloffFactor
 
-
-                if (dotProduct.isNaN()) {
-                    dotProduct = 0f
+                val pointAlpha = if (
+                    isPlanetFartherFromLightSource(
+                        planetPointCoord,
+                        lightSource3d
+                    ) && isPlanetExactlyBehindLightSource(
+                        planetPointCoord,
+                        lightSource3d,
+                        lightSourceRadius
+                    )
+                ) {
+                    0f
+                } else {
+                    1f
                 }
 
                 drawCircle(
                     color = Color.hsl(
                         hue = planetDetails.hue,
                         saturation = planetDetails.saturation,
-                        lightness = dotProduct.coerceIn(0f..1f),
-                        alpha = if (isBehindLightSource(coord, lightSource3d)) {
-                            0f
-                        } else {
-                            1f
-                        }
+                        lightness = pointLightness.coerceIn(0f..1f),
+                        alpha = pointAlpha
                     ),
                     radius = 2f,
-                    center = Offset(coord.x, coord.y)
+                    center = Offset(planetPointCoord.x, planetPointCoord.y)
                 )
             }
         }
     }
 }
 
-private fun isBehindLightSource(
+
+private fun getDotProduct(
+    normalizedPointCoord: Float3,
+    normalizedLightSourceCoord: Float3
+): Float {
+
+    var dotProduct = dot(
+        normalizedPointCoord,
+        normalizedLightSourceCoord
+    )
+
+
+    if (dotProduct.isNaN()) {
+        dotProduct = 0f
+    }
+
+    return dotProduct.coerceIn(0f..1f)
+}
+
+private fun isPlanetFartherFromLightSource(
     planetLocation: Float3,
     lightSourceLocation: Float3
 ): Boolean {
-    return planetLocation.z < lightSourceLocation.z &&
-            (planetLocation.x !in ((lightSourceLocation.x - 100)..lightSourceLocation.x + 100) &&
-                    planetLocation.y !in ((lightSourceLocation.y - 100)..lightSourceLocation.y + 100))
+    return planetLocation.z > lightSourceLocation.z
+}
+
+private fun isPlanetExactlyBehindLightSource(
+    planetLocation: Float3,
+    lightSourceLocation: Float3,
+    lightSourceRadius: Float
+): Boolean {
+   return distance(planetLocation.xy, lightSourceLocation.xy) <= lightSourceRadius
 }

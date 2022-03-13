@@ -5,7 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
-import com.thelumierguy.solarsystemapp.ui.composables.PlanetComposable
+import com.thelumierguy.solarsystemapp.ui.composables.planet_layout.data.PlanetDetails
+import com.thelumierguy.solarsystemapp.ui.modifier.recomposeHighlighter
 import dev.romainguy.kotlin.math.Float2
 import dev.romainguy.kotlin.math.PI
 import dev.romainguy.kotlin.math.TWO_PI
@@ -15,7 +16,12 @@ import kotlin.math.roundToInt
 import kotlin.math.sin
 
 @Composable
-fun PlanetsLayout() {
+fun PlanetsLayout(
+    planetDetailsList: List<PlanetDetails>,
+    lightSourceLocation: Float2,
+    content: @Composable (PlanetsLayoutScope.() -> Unit)
+) {
+
     val infiniteTransition = rememberInfiniteTransition()
 
     val planetRotationAnimations = planetDetailsList.mapIndexed { index, planetDetails ->
@@ -33,29 +39,14 @@ fun PlanetsLayout() {
         )
     }
 
-    var lightSourceLocation = remember {
-        Float2(0f, 0f)
-    }
 
     Layout(
         content = {
             planetDetailsList.forEachIndexed { index, planetDetails ->
-                PlanetComposable(
-                    planetDetails = planetDetails,
-                    modifier = Modifier,
-                    lightSourceLocationProvider = { lightSourceLocation },
-                    index = index
-                )
+                PlanetsLayoutScopeImpl(index, planetDetails).content()
             }
         },
         measurePolicy = { measurables, constraints ->
-
-            val screenCenter = Float2(
-                constraints.maxWidth / 2f,
-                constraints.maxHeight / 2f,
-            )
-
-            lightSourceLocation = screenCenter
 
             val placeables = measurables.mapIndexed { index, measurable ->
 
@@ -84,8 +75,8 @@ fun PlanetsLayout() {
                     // Placed along an elliptical orbit
                     val coordinate = Float2(
                         cos(angle) * (indexF + 1) * 250,
-                        sin(angle) * (indexF + 1) * 10
-                    ) + screenCenter
+                        sin(angle) * (indexF + 1) * 30
+                    ) + lightSourceLocation
 
                     val radius = planetDetailsList[index].radius
 
@@ -99,45 +90,12 @@ fun PlanetsLayout() {
                         placeable.placeRelative(
                             coordinate.x.roundToInt(),
                             coordinate.y.roundToInt(),
-                            zIndex = if (isBehindLightSource) {
+                            zIndex = if (isBehindLightSource) { // invert zIndex if behind the lightSource
                                 -indexF
-                            } else indexF // invert zIndex if behind the lightSource
+                            } else indexF
                         )
                 }
             }
         }
     )
 }
-
-val planetDetailsList = listOf(
-    PlanetDetails(
-        hue = 200f,
-        saturation = 0.2f,
-        radius = 30f,
-        revolutionDurationDays = 88
-    ),
-    PlanetDetails(
-        hue = 30f,
-        saturation = 0.3f,
-        radius = 35f,
-        revolutionDurationDays = 224
-    ),
-    PlanetDetails(
-        hue = 220f,
-        saturation = 0.4f,
-        radius = 40f,
-        revolutionDurationDays = 365
-    ),
-    PlanetDetails(
-        hue = 10f,
-        saturation = 0.6f,
-        radius = 35f,
-        revolutionDurationDays = 687
-    ),
-    PlanetDetails(
-        hue = 30f,
-        saturation = 0.4f,
-        radius = 60f,
-        revolutionDurationDays = 4346
-    )
-)

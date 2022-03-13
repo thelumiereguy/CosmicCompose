@@ -9,8 +9,9 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat.Type.systemBars
 import androidx.core.view.WindowInsetsControllerCompat
-import com.thelumierguy.solarsystemapp.ui.composables.SolarSystemComposable
+import com.thelumierguy.solarsystemapp.ui.composables.SolarSystemContainer
 import com.thelumierguy.solarsystemapp.ui.theme.SolarSystemAppTheme
 
 @ExperimentalComposeUiApi
@@ -20,7 +21,7 @@ class MainActivity : ComponentActivity() {
         hideSystemBars()
         setContent {
             SolarSystemAppTheme {
-                SolarSystemComposable(
+                SolarSystemContainer(
                     Modifier.fillMaxSize()
                 )
             }
@@ -34,8 +35,7 @@ class MainActivity : ComponentActivity() {
         // Configure the behavior of the hidden system bars
         windowInsetsController.systemBarsBehavior =
             WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        // Hide both the status bar and the navigation bar
-        window?.decorView?.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+
+        windowInsetsController.hide(systemBars())
     }
 }
