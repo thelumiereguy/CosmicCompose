@@ -26,10 +26,8 @@ private const val pixelsDivisions = 2
 fun PlanetsLayoutScope.PlanetComposable(
     modifier: Modifier,
     lightSourceRadius: Float,
-    lightSourceLocationProvider: () -> Float2
+    lightSourceLocation: Float2
 ) {
-
-    val lightSourceLocation = lightSourceLocationProvider()
 
     var worldPosition by remember {
         mutableStateOf(Float2(0f, 0f))
@@ -44,7 +42,8 @@ fun PlanetsLayoutScope.PlanetComposable(
 
 
     val lightSource3d = remember(
-        key1 = worldPosition
+        key1 = worldPosition,
+        key2 = lightSourceLocation
     ) {
         // Translate around origin
         val lightSourceTranslated = lightSourceLocation - worldPosition
@@ -60,7 +59,6 @@ fun PlanetsLayoutScope.PlanetComposable(
 
 
     val pointsList = remember {
-
         val bounds = planetDetails.radius.roundToInt()
         (-bounds..bounds step pixelsDivisions).flatMap { x ->
             (-bounds..bounds step pixelsDivisions).mapNotNull { y ->
@@ -70,7 +68,7 @@ fun PlanetsLayoutScope.PlanetComposable(
                 )
                 val length = length(pos)
                 if (length <= bounds) {
-                    val z = length - planetDetails.radius
+                    val z = (length - planetDetails.radius)
                     Float3(pos, z)
                 } else null
             }
@@ -81,51 +79,48 @@ fun PlanetsLayoutScope.PlanetComposable(
         val position = layoutCoordinates.positionInParent()
         worldPosition = Float2(position.x, position.y)
     }) {
+        pointsList.forEach { planetPointCoord ->
 
-        if (lightSourceLocation.x != 0f && lightSourceLocation.y != 0f) {
-            pointsList.forEach { planetPointCoord ->
+            val normalizedCoord = normalize(
+                planetPointCoord
+            )
 
-                val normalizedCoord = normalize(
-                    planetPointCoord
-                )
+            val normalizedLightSource3D = normalize(
+                lightSource3d
+            )
 
-                val normalizedLightSource3D = normalize(
+            val lightFalloffFactor = 0.8f / (index + 1) // Farther planets receive less light
+
+            val pointLightness = getDotProduct(
+                normalizedCoord,
+                normalizedLightSource3D
+            ) * lightFalloffFactor
+
+            val pointAlpha = if (
+                isPlanetFartherFromLightSource(
+                    planetPointCoord,
                     lightSource3d
+                ) && isPlanetExactlyBehindLightSource(
+                    planetPointCoord,
+                    lightSource3d,
+                    lightSourceRadius
                 )
-
-                val lightFalloffFactor = 0.8f / (index + 1) // Inverse of index
-
-                val pointLightness = getDotProduct(
-                    normalizedCoord,
-                    normalizedLightSource3D
-                ) * lightFalloffFactor
-
-                val pointAlpha = if (
-                    isPlanetFartherFromLightSource(
-                        planetPointCoord,
-                        lightSource3d
-                    ) && isPlanetExactlyBehindLightSource(
-                        planetPointCoord,
-                        lightSource3d,
-                        lightSourceRadius
-                    )
-                ) {
-                    0f
-                } else {
-                    1f
-                }
-
-                drawCircle(
-                    color = Color.hsl(
-                        hue = planetDetails.hue,
-                        saturation = planetDetails.saturation,
-                        lightness = pointLightness.coerceIn(0f..1f),
-                        alpha = pointAlpha
-                    ),
-                    radius = 2f,
-                    center = Offset(planetPointCoord.x, planetPointCoord.y)
-                )
+            ) {
+                0f
+            } else {
+                1f
             }
+
+            drawCircle(
+                color = Color.hsl(
+                    hue = planetDetails.hue,
+                    saturation = planetDetails.saturation,
+                    lightness = pointLightness.coerceIn(0f..1f),
+                    alpha = pointAlpha
+                ),
+                radius = 2f,
+                center = Offset(planetPointCoord.x, planetPointCoord.y)
+            )
         }
     }
 }
@@ -153,7 +148,7 @@ private fun isPlanetFartherFromLightSource(
     planetLocation: Float3,
     lightSourceLocation: Float3
 ): Boolean {
-    return planetLocation.z > lightSourceLocation.z
+    return planetLocation.z >= lightSourceLocation.z
 }
 
 private fun isPlanetExactlyBehindLightSource(
@@ -161,5 +156,5 @@ private fun isPlanetExactlyBehindLightSource(
     lightSourceLocation: Float3,
     lightSourceRadius: Float
 ): Boolean {
-   return distance(planetLocation.xy, lightSourceLocation.xy) <= lightSourceRadius
+    return distance(planetLocation.xy, lightSourceLocation.xy) <= lightSourceRadius
 }

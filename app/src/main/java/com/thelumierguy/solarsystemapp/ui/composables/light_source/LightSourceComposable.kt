@@ -55,6 +55,7 @@ fun LightSourceComposable(
                     ),
                     Color.Transparent,
                 ),
+                center = Offset(location.x, location.y),
                 radius = radius
             ),
             radius = radius,

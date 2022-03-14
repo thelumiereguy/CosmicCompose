@@ -1,5 +1,6 @@
 package com.thelumierguy.solarsystemapp.ui.composables.stars
 
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,8 +36,24 @@ fun StarsComposable(modifier: Modifier) {
             }
         }
 
+        val infiniteTransition = rememberInfiniteTransition()
+
+        val starBlinkingAnimationList = stars.mapIndexed { index, _ ->
+            infiniteTransition.animateFloat(
+                initialValue = 0f,
+                targetValue = 1f,
+                animationSpec = infiniteRepeatable(
+                    tween(
+                        (index + 1) * 25,
+                        easing = LinearEasing
+                    ),
+                    RepeatMode.Reverse
+                ),
+            )
+        }
+
         Canvas(modifier = modifier) {
-            stars.forEach { star ->
+            stars.forEachIndexed { index, star ->
                 val radius = when (star.distance) {
                     StarDistance.Far -> 3f
                     StarDistance.Farther -> 2f
@@ -44,7 +61,9 @@ fun StarsComposable(modifier: Modifier) {
                 }
 
                 drawCircle(
-                    Color.DarkGray,
+                    Color.DarkGray.copy(
+                        alpha = starBlinkingAnimationList[index].value
+                    ),
                     radius,
                     star.coordinate,
                 )

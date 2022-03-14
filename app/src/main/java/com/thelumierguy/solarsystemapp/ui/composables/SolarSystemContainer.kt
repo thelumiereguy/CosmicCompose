@@ -1,5 +1,6 @@
 package com.thelumierguy.solarsystemapp.ui.composables
 
+import android.view.MotionEvent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,13 +10,14 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ExperimentalGraphicsApi
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.tooling.preview.Preview
 import com.thelumierguy.solarsystemapp.ui.composables.light_source.LightSourceComposable
 import com.thelumierguy.solarsystemapp.ui.composables.planet.PlanetComposable
 import com.thelumierguy.solarsystemapp.ui.composables.planet_layout.PlanetsLayout
 import com.thelumierguy.solarsystemapp.ui.composables.planet_layout.data.planetDetailsList
 import com.thelumierguy.solarsystemapp.ui.composables.stars.StarsComposable
-import com.thelumierguy.solarsystemapp.ui.modifier.recomposeHighlighter
 import dev.romainguy.kotlin.math.Float2
 
 // Container Composable hosting multiple layers
@@ -26,19 +28,22 @@ fun SolarSystemContainer(modifier: Modifier) {
 
     BoxWithConstraints(modifier = modifier.background(Color.Black)) {
 
-        val lightSourceLocation by remember(
+        val screenMid = remember(
             key1 = constraints.maxWidth,
             key2 = constraints.maxHeight
         ) {
-            mutableStateOf(
-                Float2(
-                    constraints.maxWidth / 2f,
-                    constraints.maxHeight / 2f
-                )
+            Float2(
+                constraints.maxWidth / 2f,
+                constraints.maxHeight / 2f
             )
         }
 
-        val lightSourceRadius = derivedStateOf {
+        //Coordinates of light source with list saver
+        var lightSourceLocation by remember {
+            mutableStateOf(screenMid)
+        }
+
+        val lightSourceRadius = remember {
             minOf(
                 constraints.maxWidth,
                 constraints.maxHeight
@@ -54,19 +59,39 @@ fun SolarSystemContainer(modifier: Modifier) {
         LightSourceComposable(
             Modifier
                 .fillMaxSize()
-                .align(Alignment.Center),
+                .pointerInteropFilter { event ->
+                    when (event.action) {
+                        MotionEvent.ACTION_DOWN -> {
+                            lightSourceLocation = lightSourceLocation.copy(
+                                event.x,
+                                event.y
+                            )
+                        }
+                        MotionEvent.ACTION_MOVE -> {
+                            lightSourceLocation = lightSourceLocation.copy(
+                                event.x,
+                                event.y
+                            )
+                        }
+                    }
+                    true
+                },
             location = lightSourceLocation,
-            radius = lightSourceRadius.value
+            radius = lightSourceRadius
         )
 
         PlanetsLayout(
             planetDetailsList = planetDetailsList,
-            lightSourceLocation = lightSourceLocation
+            lightSourceRadius = lightSourceRadius,
+            modifier = Modifier.graphicsLayer {
+                translationX = screenMid.x
+                translationY = screenMid.y
+            },
         ) {
             PlanetComposable(
-                modifier = Modifier.recomposeHighlighter(),
-                lightSourceRadius = lightSourceRadius.value,
-                lightSourceLocationProvider = { lightSourceLocation }
+                modifier = Modifier,
+                lightSourceRadius = lightSourceRadius,
+                lightSourceLocation = lightSourceLocation - screenMid
             )
         }
     }
