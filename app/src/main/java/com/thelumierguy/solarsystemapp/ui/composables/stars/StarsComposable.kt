@@ -62,7 +62,9 @@ fun StarsComposable(modifier: Modifier) {
 
                 drawCircle(
                     Color.DarkGray.copy(
-                        alpha = starBlinkingAnimationList[index].value
+                        alpha = starBlinkingAnimationList[
+                                index
+                        ].value
                     ),
                     radius,
                     star.coordinate,

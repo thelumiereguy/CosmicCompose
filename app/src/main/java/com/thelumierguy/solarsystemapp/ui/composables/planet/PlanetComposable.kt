@@ -38,7 +38,6 @@ fun PlanetsLayoutScope.PlanetComposable(
         )
     }
 
-
     val lightSource3d = remember(
         key1 = worldPlanetPosition,
         key2 = lightSourceLocation
@@ -48,12 +47,12 @@ fun PlanetsLayoutScope.PlanetComposable(
             -1f
         )
 
-        //
+        // Translate light source, and rotate around the origin
         val lightSourceTranslated = lightSourceLocation - worldPlanetPosition
 
         Float3(
             lightSourceTranslated,
-            dot(
+            dot( // Just some extra FX to change how light effects the planet when behind/front of light source
                 downVectorNormalized,
                 normalize(lightSourceTranslated)
             ) * 250f
@@ -61,8 +60,14 @@ fun PlanetsLayoutScope.PlanetComposable(
     }
 
 
+    /**
+     * (radius * radius) points which are then rendered with each point
+     * having distinct lightness, alpha, etc
+     */
     val pointsList = remember {
+
         val bounds = planetDetails.radius.roundToInt()
+
         (-bounds..bounds step pixelsDivisions).flatMap { x ->
             (-bounds..bounds step pixelsDivisions).mapNotNull { y ->
                 val pos = Float2(
@@ -82,6 +87,7 @@ fun PlanetsLayoutScope.PlanetComposable(
         val position = layoutCoordinates.positionInParent()
         worldPlanetPosition = Float2(position.x, position.y)
     }) {
+
         pointsList.forEach { planetPointCoord ->
 
             val normalizedCoord = normalize(
@@ -92,13 +98,16 @@ fun PlanetsLayoutScope.PlanetComposable(
                 lightSource3d
             )
 
-            val lightFalloffFactor = 0.8f / (index + 1) // Farther planets receive less light
+            // Farther planets receive less light
+            val lightFalloffFactor = 0.8f / (index + 1)
 
             val pointLightness = getDotProduct(
                 normalizedCoord,
                 normalizedLightSource3D
             ) * lightFalloffFactor
 
+
+            // Don't render points if directly behind the light source
             val pointAlpha = if (
                 isPlanetFartherFromLightSource(
                     planetPointCoord,
