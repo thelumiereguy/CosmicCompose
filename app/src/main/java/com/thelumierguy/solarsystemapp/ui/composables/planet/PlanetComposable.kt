@@ -10,16 +10,19 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import com.thelumierguy.solarsystemapp.ui.composables.planet_layout.PlanetsLayoutScope
 import dev.romainguy.kotlin.math.*
-import kotlin.math.atan
 import kotlin.math.roundToInt
 
-// lower means more quality
+/**
+ * Number of pixel subdivisions.
+ * Less would mean better quality but poor performance
+ **/
 private const val pixelsDivisions = 2
 
 /**
  *Composable to draw single planet
- * Currently, the light source is centered in the screen,
- * making the calculations easier
+ *
+ * The shading is hacked here by keeping the planet at origin,
+ * and the sun rotating around it
  */
 @OptIn(ExperimentalGraphicsApi::class)
 @Composable
@@ -29,31 +32,31 @@ fun PlanetsLayoutScope.PlanetComposable(
     lightSourceLocation: Float2
 ) {
 
-    var worldPosition by remember {
-        mutableStateOf(Float2(0f, 0f))
-    }
-
-    val downVectorNormalized = remember {
-        Float2(
-            0f,
-            -1f
+    var worldPlanetPosition by remember {
+        mutableStateOf(
+            Float2(0f, 0f)
         )
     }
 
 
     val lightSource3d = remember(
-        key1 = worldPosition,
+        key1 = worldPlanetPosition,
         key2 = lightSourceLocation
     ) {
-        // Translate around origin
-        val lightSourceTranslated = lightSourceLocation - worldPosition
+        val downVectorNormalized = Float2(
+            0f,
+            -1f
+        )
+
+        //
+        val lightSourceTranslated = lightSourceLocation - worldPlanetPosition
 
         Float3(
             lightSourceTranslated,
             dot(
                 downVectorNormalized,
                 normalize(lightSourceTranslated)
-            ) * 500f
+            ) * 250f
         )
     }
 
@@ -77,7 +80,7 @@ fun PlanetsLayoutScope.PlanetComposable(
 
     Canvas(modifier = modifier.onGloballyPositioned { layoutCoordinates ->
         val position = layoutCoordinates.positionInParent()
-        worldPosition = Float2(position.x, position.y)
+        worldPlanetPosition = Float2(position.x, position.y)
     }) {
         pointsList.forEach { planetPointCoord ->
 
