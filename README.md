@@ -15,12 +15,12 @@ the shaded look.
 
 ### Screen recording
 
-![gif recording](https://user-images.githubusercontent.com/46375353/158435491-358b59aa-08d5-4bec-8c44-dca0104d28e7.gif)
+![gif recording](https://user-images.githubusercontent.com/46375353/158436551-7361844e-f706-4e9d-b9cc-78f23ac112fd.gif)
 
 #### Screenshots
 
-![screenshot_1](https://user-images.githubusercontent.com/46375353/158434055-4abe5cd9-109c-47cf-860d-6435836cc9ba.jpg)
+![screenshot_1](https://user-images.githubusercontent.com/46375353/158436963-f0c4e357-6f67-41f2-bb18-5800ebbc9e81.jpeg)
 
-![screenshot_2](https://user-images.githubusercontent.com/46375353/158434066-ed22aee6-eb9a-4823-8e78-d6463f11101f.jpg)
+![screenshot_2](https://user-images.githubusercontent.com/46375353/158436971-22f8f770-dfef-4095-8c5a-3745244268f0.jpeg)
 
 
