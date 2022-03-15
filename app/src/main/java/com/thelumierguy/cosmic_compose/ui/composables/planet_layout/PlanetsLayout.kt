@@ -78,7 +78,7 @@ fun PlanetsLayout(
                     val coordinate = Float2(
                         cos(angle) * (indexF + 1) * (lightSourceRadius * 2),
                         sin(angle) * (indexF + 1) * 30
-                    ) + screenCenter
+                    ) + screenCenter // Translate to middle of screen
 
                     val zIndex = if (angle > PI) { // invert zIndex if behind the lightSource
                         -indexF

@@ -43,7 +43,7 @@ fun StarsComposable(
             targetValue = 1f,
             animationSpec = infiniteRepeatable(
                 tween(
-                    Random.nextInt(0, index) * 25,
+                    (index + 1) * 25,
                     easing = LinearEasing
                 ),
                 RepeatMode.Reverse
