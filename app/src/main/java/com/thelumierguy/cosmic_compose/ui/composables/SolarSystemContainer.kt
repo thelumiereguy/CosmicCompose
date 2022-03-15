@@ -64,8 +64,6 @@ fun SolarSystemContainer(modifier: Modifier) {
             )
         )
 
-
-
         StarsComposable(
             Modifier
                 .fillMaxSize()

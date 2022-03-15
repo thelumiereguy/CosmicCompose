@@ -16,7 +16,7 @@ import kotlin.math.roundToInt
  * Number of pixel subdivisions.
  * Less would mean better quality but poor performance
  **/
-private const val pixelsDivisions = 2
+private const val pixelsDivisions = 1
 
 /**
  *Composable to draw single planet
@@ -29,7 +29,7 @@ private const val pixelsDivisions = 2
 fun PlanetsLayoutScope.PlanetComposable(
     modifier: Modifier,
     lightSourceRadius: Float,
-    lightSourceLocation: Float2
+    lightSourceLocationProvider: () -> Float2
 ) {
 
     var worldPlanetPosition by remember {
@@ -40,7 +40,6 @@ fun PlanetsLayoutScope.PlanetComposable(
 
     val lightSource3d = remember(
         key1 = worldPlanetPosition,
-        key2 = lightSourceLocation
     ) {
         val downVectorNormalized = Float2(
             0f,
@@ -48,7 +47,7 @@ fun PlanetsLayoutScope.PlanetComposable(
         )
 
         // Translate light source, and rotate around the origin
-        val lightSourceTranslated = lightSourceLocation - worldPlanetPosition
+        val lightSourceTranslated = lightSourceLocationProvider() - worldPlanetPosition
 
         Float3(
             lightSourceTranslated,
@@ -101,6 +100,7 @@ fun PlanetsLayoutScope.PlanetComposable(
             )
 
             // Farther planets receive less light
+            // Should ideally be done using distance, but oh well
             val lightFalloffFactor = 0.8f / (index + 1)
 
             val pointLightness = getDotProduct(
