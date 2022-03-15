@@ -1,4 +1,4 @@
-package com.thelumierguy.solarsystemapp.ui.composables.planet
+package com.thelumierguy.cosmic_compose.ui.composables.planet
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.*
@@ -8,7 +8,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ExperimentalGraphicsApi
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
-import com.thelumierguy.solarsystemapp.ui.composables.planet_layout.PlanetsLayoutScope
+import com.thelumierguy.cosmic_compose.ui.composables.planet_layout.PlanetsLayoutScope
 import dev.romainguy.kotlin.math.*
 import kotlin.math.roundToInt
 
@@ -75,6 +75,8 @@ fun PlanetsLayoutScope.PlanetComposable(
                     y.toFloat()
                 )
                 val length = length(pos)
+
+                // Optimization - Filter out items out of circle bounds
                 if (length <= bounds) {
                     val z = (length - planetDetails.radius)
                     Float3(pos, z)

@@ -1,4 +1,4 @@
-package com.thelumierguy.solarsystemapp.ui.composables
+package com.thelumierguy.cosmic_compose.ui.composables
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -13,11 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ExperimentalGraphicsApi
 import androidx.compose.ui.tooling.preview.Preview
-import com.thelumierguy.solarsystemapp.ui.composables.light_source.LightSourceComposable
-import com.thelumierguy.solarsystemapp.ui.composables.planet.PlanetComposable
-import com.thelumierguy.solarsystemapp.ui.composables.planet_layout.PlanetsLayout
-import com.thelumierguy.solarsystemapp.ui.composables.planet_layout.data.planetDetailsList
-import com.thelumierguy.solarsystemapp.ui.composables.stars.StarsComposable
+import com.thelumierguy.cosmic_compose.ui.composables.light_source.LightSourceComposable
+import com.thelumierguy.cosmic_compose.ui.composables.planet.PlanetComposable
+import com.thelumierguy.cosmic_compose.ui.composables.planet_layout.PlanetsLayout
+import com.thelumierguy.cosmic_compose.ui.composables.planet_layout.data.planetDetailsList
+import com.thelumierguy.cosmic_compose.ui.composables.stars.StarsComposable
 import dev.romainguy.kotlin.math.Float2
 
 // Container Composable hosting multiple layers
@@ -53,7 +53,8 @@ fun SolarSystemContainer(modifier: Modifier) {
         StarsComposable(
             Modifier
                 .fillMaxSize()
-                .align(Alignment.Center)
+                .align(Alignment.Center),
+            maxOf(constraints.maxWidth, constraints.maxHeight)
         )
 
         LightSourceComposable(

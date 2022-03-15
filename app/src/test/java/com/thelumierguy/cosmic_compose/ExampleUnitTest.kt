@@ -1,4 +1,4 @@
-package com.thelumierguy.solarsystemapp
+package com.thelumierguy.cosmic_compose
 
 import org.junit.Test
 

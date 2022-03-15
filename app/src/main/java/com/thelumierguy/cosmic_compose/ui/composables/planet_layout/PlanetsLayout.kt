@@ -1,9 +1,9 @@
-package com.thelumierguy.solarsystemapp.ui.composables.planet_layout
+package com.thelumierguy.cosmic_compose.ui.composables.planet_layout
 
 import androidx.compose.animation.core.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.layout.Layout
-import com.thelumierguy.solarsystemapp.ui.composables.planet_layout.data.PlanetDetails
+import com.thelumierguy.cosmic_compose.ui.composables.planet_layout.data.PlanetDetails
 import dev.romainguy.kotlin.math.*
 import kotlin.math.cos
 import kotlin.math.roundToInt

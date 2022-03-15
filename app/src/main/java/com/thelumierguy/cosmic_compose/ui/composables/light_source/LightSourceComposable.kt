@@ -1,4 +1,4 @@
-package com.thelumierguy.solarsystemapp.ui.composables.light_source
+package com.thelumierguy.cosmic_compose.ui.composables.light_source
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize

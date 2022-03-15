@@ -1,4 +1,4 @@
-package com.thelumierguy.solarsystemapp.ui.theme
+package com.thelumierguy.cosmic_compose.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

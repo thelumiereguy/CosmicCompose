@@ -1,7 +1,7 @@
-package com.thelumierguy.solarsystemapp.ui.composables.planet_layout
+package com.thelumierguy.cosmic_compose.ui.composables.planet_layout
 
 import androidx.compose.runtime.Stable
-import com.thelumierguy.solarsystemapp.ui.composables.planet_layout.data.PlanetDetails
+import com.thelumierguy.cosmic_compose.ui.composables.planet_layout.data.PlanetDetails
 
 @Stable
 interface PlanetsLayoutScope {

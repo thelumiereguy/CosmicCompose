@@ -1,4 +1,4 @@
-package com.thelumierguy.solarsystemapp.ui.composables.planet_layout.data
+package com.thelumierguy.cosmic_compose.ui.composables.planet_layout.data
 
 import androidx.compose.runtime.Immutable
 
