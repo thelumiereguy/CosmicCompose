@@ -2,8 +2,7 @@
 
 # 🎨 Cosmic Compose
 
-Cosmic Compose is a minimal Android app made with **Jetpack Compose**. Everything has been drawn on
-a 2D canvas, and animated using Compose's animation API. Shading has been achieved using a few
+Cosmic Compose is a minimal Android app made with **Jetpack Compose**. The main purpose of this project is to demonstrate the usage of Layout Composable. Everything has been drawn using Canvas, and animated using Compose's animation API. Shading has been achieved using a few
 hacks. ;)
 
 #### In a nutshell
